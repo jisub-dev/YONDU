@@ -6,7 +6,7 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "userdh_test")
+@Table(name = "member")
 @Getter
 @Setter
 public class UserEntity {
@@ -57,7 +57,7 @@ public class UserEntity {
     private String receiptInfo;
 
     @Column(name = "trainer_id")
-    private Long trainerId;
+    private String trainerId;
 
     @Column(name = "banned", nullable = false)
     private boolean banned;
