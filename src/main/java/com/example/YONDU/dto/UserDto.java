@@ -23,7 +23,7 @@ public class UserDto {
     private String refundAccount;
     private Bank refundBank;
     private String receiptInfo;
-    private Long trainerId;
+    private String trainerId;
     private boolean banned;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

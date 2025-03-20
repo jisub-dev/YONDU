@@ -83,46 +83,31 @@ public class LoggingController {
         }
     }
     @DeleteMapping("/seesion")
-    public ResponseEntity<Map<String, Object>> logout(@RequestBody Map<String, String> loginRequest) {
+    public ResponseEntity<Map<String, Object>> logout(@RequestBody Map<String, String> logoutRequest) {
         try {
-            String identifier = loginRequest.get("identifier");
-            String password = loginRequest.get("password");
+            String identifier = logoutRequest.get("identifier");
 
             // 이메일 또는 비밀번호 누락 시 400 Bad Request 반환
-            if (identifier == null || password == null) {
+            if (identifier == null) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
                         "success", false,
-                        "message", "Email and password are required"
+                        "message", "Email are required"
                 ));
             }
 
             Optional<UserEntity> userOptional = userRepository.findById(identifier);
 
-            if (userOptional.isEmpty() || !passwordEncoder.matches(password, userOptional.get().getPassword())) {
+            if (userOptional.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
                         "success", false,
-                        "message", "Invalid identifier or password"
+                        "message", "Invalid identifier"
                 ));
             }
             UserEntity user = userOptional.get();
 
-            if (user.isBanned()) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of(
-                        "success", false,
-                        "message", "User is banned"
-                ));
-            }
-            // JWT 액세스 토큰 및 리프레시 토큰 생성
-            String token = jwtService.generateToken(user.getIdentifier());
-            String refreshToken = jwtService.generateRefreshToken(user.getIdentifier());
-
-            // 리프레시 토큰을 저장 후 업데이트
-            user.setRefreshToken(refreshToken);
-            userRepository.save(user);
-
             return ResponseEntity.ok(Map.of(
                     "success", true,
-                    "token", token,
+                    "message", "logout",
                     "user", new UserDto(userOptional.get())
             ));
         } catch (Exception e) {
@@ -148,7 +133,7 @@ public class LoggingController {
             String refundAccount = signUpRequest.get("refund_account");
             String refundBank = signUpRequest.get("refund_bank");
             String receiptInfo = signUpRequest.get("receipt_info");
-            Long trainerId = signUpRequest.containsKey("trainer_id") ? Long.parseLong(signUpRequest.get("trainer_id")) : null;
+            String trainerId = signUpRequest.get("trainer_id");
 
             // 필수 필드 확인 (400 Bad Request)
             if (identifier == null || password == null || name == null || phone == null) {
@@ -188,7 +173,7 @@ public class LoggingController {
             Bank selectedBank = Bank.fromString(refundBank); // 한글 은행명을 Enum으로 변환
             newUser.setRefundBank(selectedBank);
             newUser.setReceiptInfo(receiptInfo);
-            newUser.setTrainerId(trainerId);
+            newUser.setTrainerId(null);
             newUser.setBanned(false);
             newUser.setRole(Role.MEMBER);
             newUser.setCreatedAt(LocalDateTime.now());
