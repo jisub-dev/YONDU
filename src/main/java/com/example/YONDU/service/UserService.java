@@ -1,7 +1,7 @@
 package com.example.YONDU.service;
 
 import com.example.YONDU.entity.PasswordResetToken;
-import com.example.YONDU.entity.User;
+import com.example.YONDU.entity.UserEntity;
 import com.example.YONDU.repository.PasswordResetTokenRepository;
 import com.example.YONDU.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ public class UserService {
     @Transactional
     public void resetPassword(String identifier, String tokenValue) {
         // 1) 유저 조회
-        User user = userRepository.findByIdentifier(identifier)
+        UserEntity user = userRepository.findByIdentifier(identifier)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
         // 2) 토큰 검증
