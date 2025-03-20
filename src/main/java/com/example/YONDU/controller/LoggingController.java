@@ -173,7 +173,7 @@ public class LoggingController {
             Bank selectedBank = Bank.fromString(refundBank); // 한글 은행명을 Enum으로 변환
             newUser.setRefundBank(selectedBank);
             newUser.setReceiptInfo(receiptInfo);
-            newUser.setTrainerId(null);
+            newUser.setTrainerId(trainerId);
             newUser.setBanned(false);
             newUser.setRole(Role.MEMBER);
             newUser.setCreatedAt(LocalDateTime.now());
