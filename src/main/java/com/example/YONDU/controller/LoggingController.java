@@ -1,14 +1,11 @@
 package com.example.YONDU.controller;
 
-import com.example.YONDU.dto.UserDto;
+import com.example.YONDU.dto.LogginDto;
 import com.example.YONDU.entity.Bank;
 import com.example.YONDU.entity.Role;
 import com.example.YONDU.entity.UserEntity;
 import com.example.YONDU.repository.UserRepository;
 import com.example.YONDU.service.JwtService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,7 +28,7 @@ public class LoggingController {
         this.jwtService = jwtService;
     }
 
-    @PostMapping("/seesion")
+    @PostMapping("/session")
     public ResponseEntity<Map<String, Object>> signIn(@RequestBody Map<String, String> loginRequest) {
         try {
             String identifier = loginRequest.get("identifier");
@@ -72,7 +69,8 @@ public class LoggingController {
             return ResponseEntity.ok(Map.of(
                     "success", true,
                     "token", token,
-                    "user", new UserDto(userOptional.get())
+                    "RT", refreshToken,
+                    "user", new LogginDto(userOptional.get())
             ));
         } catch (Exception e) {
             //서버 내부 오류 (500 INTERNAL_SERVER_ERROR)
@@ -82,7 +80,7 @@ public class LoggingController {
             ));
         }
     }
-    @DeleteMapping("/seesion")
+    @DeleteMapping("/session")
     public ResponseEntity<Map<String, Object>> logout(@RequestBody Map<String, String> logoutRequest) {
         try {
             String identifier = logoutRequest.get("identifier");
@@ -108,7 +106,7 @@ public class LoggingController {
             return ResponseEntity.ok(Map.of(
                     "success", true,
                     "message", "logout",
-                    "user", new UserDto(userOptional.get())
+                    "user", new LogginDto(userOptional.get())
             ));
         } catch (Exception e) {
             //서버 내부 오류 (500 INTERNAL_SERVER_ERROR)
@@ -187,7 +185,7 @@ public class LoggingController {
             return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
                     "success", true,
                     "message", "User registered successfully",
-                    "user", new UserDto(savedUser)
+                    "user", new LogginDto(savedUser)
             ));
         } catch (Exception e) {
             //서버 내부 오류 (500 INTERNAL_SERVER_ERROR)
@@ -197,4 +195,54 @@ public class LoggingController {
             ));
         }
     }
+
+    @PostMapping("/tokens/refresh")
+    public ResponseEntity<Map<String, Object>> refreshTokens(@RequestBody Map<String, String> request) {
+        try {
+            String refreshToken = request.get("RT");
+
+            if (refreshToken == null || refreshToken.isBlank()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+                        "success", false,
+                        "message", "Refresh token is required"
+                ));
+            }
+
+            Optional<UserEntity> userOptional = userRepository.findByRefreshToken(refreshToken);
+
+            if (userOptional.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
+                        "success", false,
+                        "message", "Invalid refresh token"
+                ));
+            }
+
+            if (!jwtService.validateRefreshToken(refreshToken)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
+                        "success", false,
+                        "message", "Refresh token has expired"
+                ));
+            }
+
+            UserEntity user = userOptional.get();
+            String newAccessToken = jwtService.generateToken(user.getIdentifier());
+            String newRefreshToken = jwtService.generateRefreshToken(user.getIdentifier());
+
+            user.setRefreshToken(newRefreshToken);
+            userRepository.save(user);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "token", newAccessToken,
+                    "RT", newRefreshToken
+            ));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", "Internal server error"
+            ));
+        }
+    }
+
 }

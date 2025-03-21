@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
-public class UserDto {
+public class LogginDto {
     private String identifier;
     private String name;
     private Role role;
@@ -25,10 +25,8 @@ public class UserDto {
     private String receiptInfo;
     private String trainerId;
     private boolean banned;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 
-    public UserDto(UserEntity user) {
+    public LogginDto(UserEntity user) {
         this.identifier = user.getIdentifier();
         this.name = user.getName();
         this.role = user.getRole();
@@ -43,7 +41,5 @@ public class UserDto {
         this.receiptInfo = user.getReceiptInfo();
         this.trainerId = user.getTrainerId();
         this.banned = user.isBanned();
-        this.createdAt = user.getCreatedAt();
-        this.updatedAt = user.getUpdatedAt();
     }
 }
