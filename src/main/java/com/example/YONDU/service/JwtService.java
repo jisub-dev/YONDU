@@ -13,7 +13,7 @@ public class JwtService {
     private static final String SECRET_KEY = "your-secure-secret-key-your-secure-secret-key";
     private static final String REFRESH_SECRET_KEY = "your-refresh-token-secret-key-your-refresh-token-secret-key";
     private static final long EXPIRATION_TIME = 3600000; // 1시간
-    private static final long REFRESH_EXPIRATION_TIME = 1209600000; // 7일
+    private static final long REFRESH_EXPIRATION_TIME = 1209600000; // 14일
 
 
 

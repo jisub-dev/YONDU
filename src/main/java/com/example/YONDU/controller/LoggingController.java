@@ -28,7 +28,7 @@ public class LoggingController {
         this.jwtService = jwtService;
     }
 
-    @PostMapping("/seesion")
+    @PostMapping("/session")
     public ResponseEntity<Map<String, Object>> signIn(@RequestBody Map<String, String> loginRequest) {
         try {
             String identifier = loginRequest.get("identifier");
@@ -80,7 +80,7 @@ public class LoggingController {
             ));
         }
     }
-    @DeleteMapping("/seesion")
+    @DeleteMapping("/session")
     public ResponseEntity<Map<String, Object>> logout(@RequestBody Map<String, String> logoutRequest) {
         try {
             String identifier = logoutRequest.get("identifier");
@@ -199,7 +199,7 @@ public class LoggingController {
     @PostMapping("/tokens/refresh")
     public ResponseEntity<Map<String, Object>> refreshTokens(@RequestBody Map<String, String> request) {
         try {
-            String refreshToken = request.get("refreshToken");
+            String refreshToken = request.get("RT");
 
             if (refreshToken == null || refreshToken.isBlank()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
@@ -234,7 +234,7 @@ public class LoggingController {
             return ResponseEntity.ok(Map.of(
                     "success", true,
                     "token", newAccessToken,
-                    "refreshToken", newRefreshToken
+                    "RT", newRefreshToken
             ));
 
         } catch (Exception e) {
