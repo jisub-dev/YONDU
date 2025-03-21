@@ -218,7 +218,7 @@ public class LoggingController {
             }
 
             if (!jwtService.validateRefreshToken(refreshToken)) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
+                return ResponseEntity.status(998).body(Map.of(
                         "success", false,
                         "message", "Refresh token has expired"
                 ));
