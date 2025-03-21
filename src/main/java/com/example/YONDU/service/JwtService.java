@@ -60,4 +60,17 @@ public class JwtService {
                 .signWith(Keys.hmacShaKeyFor(REFRESH_SECRET_KEY.getBytes(StandardCharsets.UTF_8)), SignatureAlgorithm.HS256)
                 .compact();
     }
+    public boolean validateRefreshToken(String token) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(Keys.hmacShaKeyFor(REFRESH_SECRET_KEY.getBytes(StandardCharsets.UTF_8)))
+                    .build()
+                    .parseClaimsJws(token); // 토큰 파싱
+            return true; // 파싱 성공 시 유효함
+        } catch (ExpiredJwtException e) {
+            return false; // 만료됨
+        } catch (JwtException e) {
+            return false; // 위조되었거나 형식 오류
+        }
+    }
 }
